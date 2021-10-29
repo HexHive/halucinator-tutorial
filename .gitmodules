@@ -1,0 +1,9 @@
+[submodule "sw/avatar-qemu"]
+	path = sw/avatar-qemu
+	url = https://github.com/Hexhive/avatar-qemu.git
+[submodule "sw/avatar2"]
+	path = sw/avatar2
+	url = https://github.com/Hexhive/avatar2.git
+[submodule "sw/halucinator"]
+	path = sw/halucinator
+	url = https://github.com/Hexhive/halucinator.git
