@@ -26,4 +26,13 @@ What we want to do is this:
     happens.
  4. See if the firmware crashes.
 
+You should be able to tackle #1 from the previous section.
 
+In `gencert.py` we have provided some code for you to generate 
+random certificates. What happens if you tweak the function parameters? 
+We ask you to explore this briefly to see the different outputs that 
+you recover.
+
+Next, we would like you to modify `extdev.py` to automatically 
+send your generated certificates to the firmware. Can you make the 
+firmware crash? What does that look like? 
