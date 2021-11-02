@@ -3,7 +3,7 @@
 # You only need to run this script if it has not been run for you in the demo 
 # environment. If it has, there is nothing to do here.
 
-UBUNTU_DEPS="gcc build-essential pkg-config gdb-multiarch python3-pip python3-virtualenv libcap-dev libpixman-1-dev libglib2.0-dev"
+UBUNTU_DEPS="gcc build-essential pkg-config gdb-multiarch python3-pip python3-virtualenv libcap-dev libpixman-1-dev libglib2.0-dev python3-ipdb"
 
 # locate this script:
 SCRIPT="${BASH_SOURCE[0]}"
@@ -24,11 +24,11 @@ else
     DISTRO=$(lsb_release -is | tr '[:upper:]' '[:lower:]')
 fi
 
-if [[ "$DISTRO" == "ubuntu" ]]; then
+if [[ "$DISTRO" == "ubuntu" || "$DISTRO" == "debian" ]]; then
     sudo apt-get install $UBUNTU_DEPS
 elif [[ "$DISTRO" == "fedora" ]]; then
     echo "We currently do not support installing dependencies on Fedora! Make sure that the necessary dependencies are installed."
-    exit(1)
+    exit
 fi
 
 # Initialize submodules and pull latest releases
