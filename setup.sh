@@ -37,6 +37,7 @@ git submodule update
 
 pushd $SCRIPTDIR/sw/
 mkdir -p avatar-qemu-build
+cd avatar-qemu-build
 
 # This builds avatar-qemu
 ../avatar-qemu/configure --disable-sdl --target-list=arm-softmmu,avr-softmmu --enable-debug --prefix=$HOME/qemu/
