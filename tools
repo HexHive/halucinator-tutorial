@@ -1,5 +1,16 @@
 #!/bin/bash
 
+# locate this script:
+SCRIPT="${BASH_SOURCE[0]}"
+SCRIPTDIR=""
+if [ -z "$SCRIPT" ]; then
+    SCRIPT=$(readlink -f $0)
+    SCRIPTDIR=$(dirname $SCRIPT)
+else
+    SCRIPTDIR="$( cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 ; pwd -P )"
+fi
+
+# check if this script has been sourced
 ([[ -n $ZSH_EVAL_CONTEXT && $ZSH_EVAL_CONTEXT =~ :file$ ]] || 
    [[ -n $KSH_VERSION && $(cd "$(dirname -- "$0")" &&
       printf '%s' "${PWD%/}/")$(basename -- "$0") != "${.sh.file}" ]] || 
@@ -12,7 +23,18 @@ fi
 
 echo "All good"
 
-function start-tutorial {
+function tutorial-start {
     source halenv/bin/activate
 }
 
+function tutorial-01 {
+    cd $SCRIPTDIR/01-firststeps
+}
+
+function tutorial-02 {
+    cd $SCRIPTDIR/02-interact
+}
+
+function tutorial-03 {
+    cd $SCRIPTDIR/03-bugs
+}

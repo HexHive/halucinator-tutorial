@@ -49,7 +49,8 @@ virtualenv -p python3 halenv
 source halenv/bin/activate
 
 # copy the right config file for global halucinator use
-cp sw/halucinator/configs/...
+mkdir -p halenv/etc/halucinator/
+cp sw/halucinator-ubuntu-config.yaml halenv/etc/halucinator/config.yaml
 
 pushd sw/avatar2
 pip install .

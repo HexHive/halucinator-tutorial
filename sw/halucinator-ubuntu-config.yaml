@@ -1,0 +1,8 @@
+---
+arm_qemu_location: /home/ubuntu/qemu/bin/qemu-system-arm
+avr_qemu_location: /home/ubuntu/qemu/bin/qemu-system-avr
+qemu_debug: false
+gdb_location: /usr/bin/gdb-multiarch
+ipc:
+    tx_port: 5556
+    rx_port: 5555

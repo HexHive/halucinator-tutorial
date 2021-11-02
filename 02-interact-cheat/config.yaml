@@ -1,0 +1,61 @@
+architecture: cortex-m4
+qemu_debug: false
+intercepts:
+# ------------------------------- Base ------------------------------------
+#- class: halucinator.bp_handlers.stm32f4.stm32f4_spi.STM32F4SPI
+#  function: HAL_SPI_Init
+- class: halucinator.bp_handlers.stm32f4.stm32f4_base.STM32F4_Base
+  function: Reset_Handler
+- class: halucinator.bp_handlers.stm32f4.stm32f4_base.STM32F4_Base
+  function: HAL_Init
+- class: halucinator.bp_handlers.stm32f4.stm32f4_base.STM32F4_Base
+  function: HAL_InitTick
+- class: halucinator.bp_handlers.stm32f4.stm32f4_base.STM32F4_Base
+  function: HAL_RCC_OscConfig
+- class: halucinator.bp_handlers.stm32f4.stm32f4_base.STM32F4_Base
+  function: SystemClock_Config
+- class: halucinator.bp_handlers.stm32f4.stm32f4_base.STM32F4_Base
+  function: HAL_RCC_ClockConfig
+- class: halucinator.bp_handlers.stm32f4.stm32f4_base.STM32F4_Base
+  function: HAL_SYSTICK_Config
+- class: halucinator.bp_handlers.stm32f4.stm32f4_base.STM32F4_Base
+  function: HAL_SYSTICK_CLKSourceConfig
+- class: halucinator.bp_handlers.stm32f4.stm32f4_base.STM32F4_Base
+  function: SystemInit
+
+- class: halucinator.bp_handlers.stm32f4.stm32f4_base.STM32F4_Base
+  function: HardFault_Handler
+
+# ------------------------------- TIM ------------------------------------
+- class: halucinator.bp_handlers.stm32f4.stm32f4_tim.STM32_TIM
+  function: HAL_Delay
+- class: halucinator.bp_handlers.stm32f4.stm32f4_tim.STM32_TIM
+  function: HAL_TIM_Base_Init
+- class: halucinator.bp_handlers.stm32f4.stm32f4_tim.STM32_TIM
+  function: HAL_TIM_Base_Start_IT
+- class: halucinator.bp_handlers.stm32f4.stm32f4_tim.STM32_TIM
+  function: HAL_TIM_DeInit
+- class: halucinator.bp_handlers.stm32f4.stm32f4_tim.STM32_TIM
+  function: HAL_TIM_Base_Stop_IT
+- class: halucinator.bp_handlers.stm32f4.stm32f4_tim.STM32_TIM
+  function: HAL_TIM_ConfigClockSource
+- class: halucinator.bp_handlers.stm32f4.stm32f4_tim.STM32_TIM
+  function: HAL_TIM_IRQHandler
+- class: halucinator.bp_handlers.stm32f4.stm32f4_tim.STM32_TIM
+  function: HAL_TIMEx_MasterConfigSynchronization
+- class: halucinator.bp_handlers.stm32f4.stm32f4_tim.STM32_TIM
+  function: HAL_TIM_ConfigClockSource
+
+
+# -------------------------------UART ----------------------------------------
+- class: halucinator.bp_handlers.stm32f4.stm32f4_uart.STM32F4UART 
+  function: HAL_UART_Init
+- class: halucinator.bp_handlers.stm32f4.stm32f4_uart.STM32F4UART 
+  function: HAL_UART_GetState
+- class: halucinator.bp_handlers.stm32f4.stm32f4_uart.STM32F4UART
+  function: HAL_UART_Transmit
+- class: halucinator.bp_handlers.stm32f4.stm32f4_uart.STM32F4UART
+  function: HAL_UART_Receive
+# ----------------------------------------------------------------------------
+
+
