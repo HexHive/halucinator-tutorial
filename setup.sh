@@ -3,7 +3,7 @@
 # You only need to run this script if it has not been run for you in the demo 
 # environment. If it has, there is nothing to do here.
 
-UBUNTU_DEPS="gcc build-essential pkg-config gdb-multiarch python3-pip python3-virtualenv libcap-dev libpixman-1-dev libglib2.0-dev python3-ipdb"
+UBUNTU_DEPS="gcc build-essential pkg-config gdb-multiarch python3-pip python3-virtualenv libcap-dev libpixman-1-dev libglib2.0-dev python3-ipdb python3-prctl"
 
 # locate this script:
 SCRIPT="${BASH_SOURCE[0]}"
