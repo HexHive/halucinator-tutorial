@@ -95,7 +95,8 @@ halucinator-rehost \
 So all the files you have modified, you should now see being used.
 
 Next, we will go a little bit further and communicate with the firmware! We 
-will send events to the device!
+will send events to the device! We therefore connect a virtual device at the
+other end of the UART. This virtual device is implemented in python.
 
 To do this, have a look at `extdev.py` script in this folder. You will see a 
 main function and handler function like this:
@@ -143,7 +144,8 @@ To see this in action, you first want to launch the firmware using `run.sh`.
 Then, open a separate terminal and type 
 
 ```
-python extdev.py
+python3 extdev.py
 ```
+
 
 To run the external device. What output do you see?
