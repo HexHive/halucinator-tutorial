@@ -28,7 +28,11 @@ if [[ "$DISTRO" == "ubuntu" ]]; then
     sudo apt-get install $UBUNTU_DEPS
 elif [[ "$DISTRO" == "fedora" ]]; then
     echo "Fedora!"
+    echo "Not implemented yet, this is todo."
+    exit(1)
 fi
+
+git submodule update --init
 
 pushd $SCRIPTDIR/sw/
 mkdir -p avatar-qemu-build
