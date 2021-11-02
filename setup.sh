@@ -27,12 +27,13 @@ fi
 if [[ "$DISTRO" == "ubuntu" ]]; then
     sudo apt-get install $UBUNTU_DEPS
 elif [[ "$DISTRO" == "fedora" ]]; then
-    echo "Fedora!"
-    echo "Not implemented yet, this is todo."
+    echo "We currently do not support installing dependencies on Fedora! Make sure that the necessary dependencies are installed."
     exit(1)
 fi
 
-git submodule update --init
+# Initialize submodules and pull latest releases
+git submodule init
+git submodule update
 
 pushd $SCRIPTDIR/sw/
 mkdir -p avatar-qemu-build
@@ -55,6 +56,6 @@ pip install .
 popd
 
 pushd sw/halucinator
-pip install -r requirements
+pip install -r requirements.txt
 pip install -e .
 popd
