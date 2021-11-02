@@ -56,10 +56,10 @@ mkdir -p halenv/etc/halucinator/
 cp sw/halucinator-ubuntu-config.yaml halenv/etc/halucinator/config.yaml
 
 pushd sw/avatar2
-$(PIP) install .
+$PIP install .
 popd
 
 pushd sw/halucinator
-$(PIP) install -r requirements.txt
-$(PIP) install -e .
+$PIP install -r requirements.txt
+$PIP install -e .
 popd
