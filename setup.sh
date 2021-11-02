@@ -59,6 +59,8 @@ pushd sw/avatar2
 $PIP install .
 popd
 
+$PIP install python-prctl ipdb
+
 pushd sw/halucinator
 $PIP install -r requirements.txt
 $PIP install -e .
