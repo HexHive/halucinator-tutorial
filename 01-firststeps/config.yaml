@@ -48,14 +48,7 @@ intercepts:
 
 
 # -------------------------------UART ----------------------------------------
-- class: halucinator.bp_handlers.stm32f4.stm32f4_uart.STM32F4UART 
-  function: HAL_UART_Init
-- class: halucinator.bp_handlers.stm32f4.stm32f4_uart.STM32F4UART 
-  function: HAL_UART_GetState
-- class: halucinator.bp_handlers.stm32f4.stm32f4_uart.STM32F4UART
-  function: HAL_UART_Transmit
-- class: halucinator.bp_handlers.stm32f4.stm32f4_uart.STM32F4UART
-  function: HAL_UART_Receive
+# TODO: insert something useful here
 # ----------------------------------------------------------------------------
 
 
