@@ -21,20 +21,44 @@ if (( $sourced == 0 )) ; then
     exit 1;
 fi
 
-echo "All good"
+echo "Everything is ready to go!"
 
-function tutorial-start {
+function tstart {
     source halenv/bin/activate
 }
 
-function tutorial-01 {
+function thome {
+    cd $SCRIPTDIR
+}
+
+function thelp {
+    cat $SCRIPTDIR/term_intro
+}
+
+function treadme {
+    xdg-open README.html
+}
+
+function t01 {
     cd $SCRIPTDIR/01-firststeps
 }
 
-function tutorial-02 {
+function t02 {
     cd $SCRIPTDIR/02-interact
 }
 
-function tutorial-03 {
+function t03 {
     cd $SCRIPTDIR/03-bugs
+}
+
+function tc01 {
+    cd $SCRIPTDIR/01-firststeps-cheat
+}
+
+function tc02 {
+    cd $SCRIPTDIR/02-interact-cheat
+}
+
+function tc03 {
+    cd $SCRIPTDIR/03-bugs-cheat
 }

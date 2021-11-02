@@ -1,0 +1,72 @@
+<h1 id="first-steps-with-halucinator">01: First Steps with HALucinator</h1>
+<p>In this part of the tutorial we will run, for the first time, a firmware under HALucinator. In this folder, you will find the following files:</p>
+<ul>
+<li>config.yaml</li>
+<li>mem.yaml</li>
+<li>run.sh</li>
+<li>stm32-f411re-uart.bin</li>
+<li>stm32-f411re-uart.elf</li>
+</ul>
+<p>Our first step is to inspect the <code>mem.yaml</code> file. This file is responsible for the overall memory mapping and configures the address space of our emulator. Each region defined in this file is mapped into the emulator address space. It should look like this:</p>
+<pre><code>memories:
+  alias: {base_addr: 0x0, file: stm32-firmware-here,
+    permissions: r-x, size: 0x800000}
+  flash: {base_addr: 0x8000000, file: stm32-firmware-here,
+    permissions: r-x, size: 0x200000}
+  ram: {base_addr: 0x20000000, size: 0x51000}
+peripherals:
+  logger: {base_addr: 0x40000000, emulate: GenericPeripheral, permissions: rw-, size: 0x20000000}</code></pre>
+<p>We need to tell HALucinator what firmware to use and map it to the correct region. For stm32, the target address is <code>0x8000000</code>. To do this, replace <code>stm32-firmware-here</code> with the name of the firmware file.</p>
+<p>This file MUST be the flat binary format that would be written to flash. In this case, it is the BIN file and not the ELF file, so replace this with <code>stm32-f411re-uart.bin</code>.</p>
+<p>Next, open <code>config.yaml</code>. This file contains the main configuration of HALucinator including the different interception points. An interception point allows the analyst to intercept execution from QEMU and redirect it to a custom implementation. You will see that some default interception points have already been added for you. However, not all are present. Especially the UART peripheral has not yet been configured. To do so, we need to define a set of UART-specific interception handlers and interception point in the firmware and connect those with HALucinator. Copy and paste the following UART-specific interception points into the file and save it:</p>
+<pre><code>- class: halucinator.bp_handlers.stm32f4.stm32f4_uart.STM32F4UART 
+  function: HAL_UART_Init
+- class: halucinator.bp_handlers.stm32f4.stm32f4_uart.STM32F4UART 
+  function: HAL_UART_GetState
+- class: halucinator.bp_handlers.stm32f4.stm32f4_uart.STM32F4UART
+  function: HAL_UART_Transmit
+- class: halucinator.bp_handlers.stm32f4.stm32f4_uart.STM32F4UART
+  function: HAL_UART_Receive</code></pre>
+<p>Last of all: we need to tell HALucinator about possible firmware addresses. The file <code>addrs.yaml</code> contains a mapping between memory addresses and symbols, allowing the other files to refer to symbols instead of the (hardly human readable) raw addresses. Luckily, we can often auto-generate this file, e.g., by extracting the information from the symbol table in an ELF file or by recovering this through a binary analysis.</p>
+<p>Since we have an ELF file, which contains these locations, we can extract this out for you. We have provided a handy tool with the HALucinator source code to do this. Copy and paste the following into your terminal:</p>
+<pre><code>halucinator-symtool -b stm32-f411re-uart.elf -o addrs.yaml</code></pre>
+<p>This will create a file <code>addrs.yaml</code>. Open it in an editor to see all the possible firmware functions we have identified.</p>
+<p>Finally, we are in a position to run the firmware! Let’s do that using the run script as follows:</p>
+<pre><code>./run.sh</code></pre>
+<p>Type, or copy-paste, this into your terminal. The firmware will run. Let it run for a little bit and then holding control, press the C key to stop it.</p>
+<p>The run.sh file contains the following command:</p>
+<pre><code>halucinator-rehost \
+  -c=./config.yaml \
+  -a=./addrs.yaml \
+  -m=./mem.yaml \
+  --log_blocks -n stm32f411re_uart</code></pre>
+<p>So all the files you have modified, you should now see being used.</p>
+<p>Next, we will go a little bit further and communicate with the firmware! We will send events to the device!</p>
+<p>To do this, have a look at <code>extdev.py</code> script in this folder. You will see a main function and handler function like this:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode py"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="kw">def</span> message_received(message):</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a>    <span class="co"># </span><span class="al">TODO</span><span class="co">: do something when we receive a message.</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a>    <span class="cf">pass</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a><span class="kw">def</span> main():</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true"></a>    logging.basicConfig()</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true"></a></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true"></a>    halzmq <span class="op">=</span> HALucinatorZMQConn(<span class="dv">5556</span>, <span class="dv">5555</span>) </span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true"></a>    uart <span class="op">=</span> UartPeripheral(halzmq, received_callback<span class="op">=</span>message_received)</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true"></a></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true"></a>    halzmq.start()</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true"></a></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true"></a>    <span class="cf">try</span>:</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true"></a>        <span class="co"># </span><span class="al">TODO</span><span class="co">: send some commands.</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true"></a>        <span class="cf">pass</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true"></a>    <span class="cf">except</span> <span class="pp">KeyboardInterrupt</span>:</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true"></a>        <span class="cf">pass</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true"></a>    log.info(<span class="st">&quot;Shutting Down&quot;</span>)</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true"></a>    halzmq.shutdown()</span></code></pre></div>
+<p>We want to modify this to send some data to HALucinator. The UartPeripheral object has methods that can help us here. Here are the lines you might consider:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode py"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a>uart.send_line(huart2, <span class="st">&#39;MY_COMMAND</span><span class="ch">\r\n</span><span class="st">&#39;</span>)</span></code></pre></div>
+<p>You can also print the output received from HALucinator in the terminal by modifying <code>message_received</code> with a simple:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode py"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a><span class="bu">print</span>(message)</span></code></pre></div>
+<p>Add some lines to your python file.</p>
+<p>To see this in action, you first want to launch the firmware using <code>run.sh</code>. Then, open a separate terminal and type</p>
+<pre><code>python extdev.py</code></pre>
+<p>To run the external device. What output do you see?</p>

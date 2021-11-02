@@ -1,0 +1,16 @@
+<h1 id="exploring-firmware-bugs">03: Exploring Firmware Bugs</h1>
+<p>For this section we will first introduce the firmware a little bit.</p>
+<p>The firmware listens over UART for a connection, which it treats as a serial console. You can <code>login</code> to the device and if successful, the firmware will accept a base64-encoded <code>DER</code> certificate to sign further firmware, and it will echo back certain information it has found from the certificate.</p>
+<p>As we will explain on the slides, certificates are encoded as ASN.1 using Distinguished Encoding Rules (DER).</p>
+<p>Here we show you how to generate a certificate and view it in DER:</p>
+<p><DER example></p>
+<p>We have taken a perfectly working ASN.1 library and added some bugs for inclusion in your demo firmware today! What we want to do is this:</p>
+<ol type="1">
+<li>Automatically log in to the firmware.</li>
+<li>Generate a certificate.</li>
+<li>Base64-encode it, and send it to the firmware to see what happens.</li>
+<li>See if the firmware crashes.</li>
+</ol>
+<p>You should be able to tackle #1 from the previous section.</p>
+<p>In <code>gencert.py</code> we have provided some code for you to generate random certificates. What happens if you tweak the function parameters? We ask you to explore this briefly to see the different outputs that you recover.</p>
+<p>Next, we would like you to modify <code>extdev.py</code> to automatically send your generated certificates to the firmware. Can you make the firmware crash? What does that look like?</p>

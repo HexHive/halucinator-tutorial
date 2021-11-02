@@ -1,0 +1,20 @@
+<h1 id="interacting-with-halucinator">02: Interacting with HALucinator</h1>
+<p>In this section we will ask you to fill out your demo to be able to interact with the firmware in an arbitrary way, as a shell.</p>
+<p>First, in this folder you will find a script <code>copy.sh</code>. Run it with</p>
+<pre><code>./copy.sh</code></pre>
+<p>To copy your setup from the first part into this part.</p>
+<p>Now, we have seen that we have a <code>UartPeripheral</code> object that can be configured to have a callback function, and also has a <code>send_line</code> method. We want to build a shell out of this, so let’s consider how we might do it.</p>
+<p>Firstly, we can read all lines being sent to us in python using</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode py"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="cf">for</span> line <span class="kw">in</span> sys.stdin:</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>    <span class="bu">print</span>(line)</span></code></pre></div>
+<p>This example will simply echo back what is input. Can you modify <code>extdev.py</code> in order to send the input to the external device.</p>
+<p>Does the <code>message_received</code> function need any improvement? What about the UartPeripheral class itself?</p>
+<p>Next, we’ll remind you of the commands the device accepts:</p>
+<ul>
+<li>version</li>
+<li>status</li>
+<li>login</li>
+<li>cert</li>
+</ul>
+<p>Try them. How do they work with your tool?</p>
+<p>Next, this is a highly secure IoT device. The username and password are <code>admin</code> and <code>123456</code>. Can you automatically send these to the device?</p>

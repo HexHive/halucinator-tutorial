@@ -1,0 +1,11 @@
+#!/bin/bash
+
+read -p "Start the HALucinator Tutorial? " -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]
+then
+    cd tutorial
+    echo term_intro
+    source halenv/bin/activate
+    source tools
+fi
