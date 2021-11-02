@@ -16,6 +16,7 @@ else
 fi
 
 # Identify Distro
+PIP=pip
 
 if ! command -v lsb_release >/dev/null 2>&1; then
     echo "No lsb_release command installed.";
@@ -26,6 +27,7 @@ fi
 
 if [[ "$DISTRO" == "ubuntu" || "$DISTRO" == "debian" ]]; then
     sudo apt-get install $UBUNTU_DEPS
+    PIP=pip3
 elif [[ "$DISTRO" == "fedora" ]]; then
     echo "We currently do not support installing dependencies on Fedora! Make sure that the necessary dependencies are installed."
     exit
@@ -54,10 +56,10 @@ mkdir -p halenv/etc/halucinator/
 cp sw/halucinator-ubuntu-config.yaml halenv/etc/halucinator/config.yaml
 
 pushd sw/avatar2
-pip install .
+$(PIP) install .
 popd
 
 pushd sw/halucinator
-pip install -r requirements.txt
-pip install -e .
+$(PIP) install -r requirements.txt
+$(PIP) install -e .
 popd
