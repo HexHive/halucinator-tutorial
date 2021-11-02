@@ -43,8 +43,7 @@ class UartPeripheral(HALucinatorExternalDevice):
 huart2 = 0x200000dc
 
 def message_received(message):
-    # TODO: do something when we receive a message.
-    pass
+    print("HAL: {}".format(message))
 
 def main():
     logging.basicConfig()
@@ -55,7 +54,8 @@ def main():
     halzmq.start()
 
     try:
-        # TODO: send some commands.
+        uart.send_line("version")
+        uart.send_line("status")
         pass
     except KeyboardInterrupt:
         pass
