@@ -28,6 +28,7 @@ during this tutorial. They are:
 ```
 halucinator-symtool
 halucinator-rehost
+```
 
 The second one is something you will use inside of run.sh.
 
