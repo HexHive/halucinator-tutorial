@@ -1,7 +1,12 @@
 # 01: First Steps with HALucinator
 
 In this part of the tutorial we will run, for the first time, a firmware under
-HALucinator.  In this folder, you will find the following files:
+HALucinator.
+
+
+## HALucinator configuration
+
+In this folder, you will find the following files:
 
  - config.yaml
  - mem.yaml
@@ -72,20 +77,23 @@ halucinator-symtool -b stm32-f411re-uart.elf -o addrs.yaml
 This will create a file `addrs.yaml`. Open it in an editor to see all the 
 possible firmware functions we have identified.
 
+
+## Running HALucinator and interacting with the firmware
+
 Finally, we are in a position to run the firmware! Let's do that using the 
 run script as follows:
 
 ```
-./run.sh
+$ ./run.sh
 ```
 
 Type, or copy-paste, this into your terminal. The firmware will run. Let it 
-run for a little bit and then holding control, press the C key to stop it.
+run for a little bit. You can press CTRL-C to stop/terminate the emulation.
 
 The run.sh file contains the following command:
 
 ```
-halucinator-rehost \
+$ halucinator-rehost \
   -c=./config.yaml \
   -a=./addrs.yaml \
   -m=./mem.yaml \
@@ -93,6 +101,18 @@ halucinator-rehost \
 ```
 
 So all the files you have modified, you should now see being used.
+
+So far, we have been configuring the emulator and running it but we are not yet
+interacting with the device. The HALucinator baseline comes with a simple UART
+device that allows you to connect a terminal to it. You can interact with your
+emulated firmware by running the following command:
+
+```
+$ python3 -m halucinator.external_devices.uart_interactive
+```
+
+
+## Scripting firmware interaction
 
 Next, we will go a little bit further and communicate with the firmware! We 
 will send events to the device! We therefore connect a virtual device at the
