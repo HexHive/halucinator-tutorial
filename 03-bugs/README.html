@@ -1,19 +1,19 @@
 <h1 id="hands-on-03-exploring-firmware-bugs">Hands-on 03: Exploring Firmware Bugs</h1>
 <p><a href="../README.html">Back</a></p>
+<p>After setting up HALucinator and exploring it, we’re going to speed things up a bit and will develop a naive fuzzer for our target device. For this section we will first introduce the firmware functionality a little bit more. The analyst would usually do this through static binary analysis (IDA) or by probing the functionality as we did in the previous step.</p>
 <p>For this section we will first introduce the firmware a little bit.</p>
-<p>The firmware listens over UART for a connection, which it treats as a serial console. You can <code>login</code> to the device and if successful, the firmware will accept a base64-encoded <code>DER</code> certificate to sign further firmware, and it will echo back certain information it has found from the certificate.</p>
-<p>As we will explain on the slides, certificates are encoded as ASN.1 using Distinguished Encoding Rules (DER).</p>
+<p>The firmware listens over UART for a connection, which it treats as a serial console. You can <code>login</code> to the device and, if successful, the firmware will accept a base64-encoded <code>DER</code> certificate to sign further firmware, and it will echo back certain information it has found from the certificate.</p>
+<p>Certificates are encoded as <a href="https://en.wikipedia.org/wiki/ASN.1">ASN.1</a> encoded as using <a href="https://en.wikipedia.org/wiki/X.690#DER_encoding">Distinguished Encoding Rules (DER)</a>.</p>
 <p>Here we show you how to generate a certificate and view it in DER:</p>
-<p><DER example></p>
-<p>We have taken a perfectly working ASN.1 library and added some bugs for inclusion in your demo firmware today! What we want to do is this:</p>
+<pre><code>&lt;DER example&gt;</code></pre>
+<p>Our tutorial firmware runs a perfectly working ASN.1 library that unfortunately has some bugs. It is up to us to find these bugs now. What we want to do is this:</p>
 <ol type="1">
 <li>Automatically log in to the firmware (part 2)</li>
 <li>Generate a certificate (gencert.py)</li>
 <li>Base64-encode it, and send it to the firmware to see what happens (gencert.py)</li>
 <li>See if the firmware crashes.</li>
 </ol>
-<p>The first part is the work we have done in the previous part.</p>
-<p>In <code>gencert.py</code> we have provided some code for you to generate random certificates in the right format. Here is the code:</p>
+<p>The first part is the work we have done in the previous part. In <code>gencert.py</code> we have provided some code for you to generate random certificates in the right format. Here is the code:</p>
 <pre><code>from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.primitives.serialization import Encoding, PrivateFormat, NoEncryption
 from OpenSSL import crypto, SSL
@@ -147,9 +147,8 @@ Public key: 1</code></pre>
 <p>In our demo firmware, we want to upload a certificate like this that will sign future firmware updates!</p>
 <p>However, we have added bugs to the firmware parser for you to find.</p>
 <p>So, you will need to modify <code>extdev.py</code>. Now you are logged into the device, you can also run the <code>cert</code> command. This responds with a prompt for the base64 encoded <code>DER</code>, which you can get from the functions we have provided.</p>
-<p>The function to generate certificates takes parameters as well. What happens if you vary these? For example you might try:</p>
-<pre><code>commonName=random_string(12)</code></pre>
-<p>as a parameter!</p>
-<p>Each time the firmware crashes you may need to restart halucinator and try again. You are likely to cause halucinator to crash - we made the bugs easy to find!</p>
-<p>What about if you send C-style format strings?</p>
-<p>What does the output look like in HALucinator?</p>
+<p>The function to generate certificates takes parameters as well. What happens if you vary these? For example you might try changing the common name and extend it with random data:</p>
+<pre><code>    commonName=random_string(12)</code></pre>
+<p>Each time the firmware crashes you may need to restart HALucinator (the terminal running <code>./run.sh</code> — press Ctrl-C and restart) and try again. These bugs are common programming bugs like missing length checks and format string issues, so give those a try!</p>
+<p>What does the output look like in HALucinator? What about if you send C-style format strings?</p>
+<p>We suggest that you implement a testing loop that walks through the four steps above and, with a timeout checks if the firmware still reacts accordingly. If you have discovered a crash, you can report the current input to the analyst and report any discovered bugs.</p>
