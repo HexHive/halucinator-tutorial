@@ -1,5 +1,7 @@
-<h1 id="first-steps-with-halucinator">01: First Steps with HALucinator</h1>
-<p>In this part of the tutorial we will run, for the first time, a firmware under HALucinator. In this folder, you will find the following files:</p>
+<h1 id="hands-on-01-first-steps-with-halucinator">Hands-on 01: First Steps with HALucinator</h1>
+<p>In this part of the tutorial we will run, for the first time, a firmware under HALucinator.</p>
+<h2 id="halucinator-configuration">HALucinator configuration</h2>
+<p>In this folder, you will find the following files:</p>
 <ul>
 <li>config.yaml</li>
 <li>mem.yaml</li>
@@ -31,42 +33,46 @@ peripherals:
 <p>Since we have an ELF file, which contains these locations, we can extract this out for you. We have provided a handy tool with the HALucinator source code to do this. Copy and paste the following into your terminal:</p>
 <pre><code>halucinator-symtool -b stm32-f411re-uart.elf -o addrs.yaml</code></pre>
 <p>This will create a file <code>addrs.yaml</code>. Open it in an editor to see all the possible firmware functions we have identified.</p>
+<h2 id="running-halucinator-and-interacting-with-the-firmware">Running HALucinator and interacting with the firmware</h2>
 <p>Finally, we are in a position to run the firmware! Let’s do that using the run script as follows:</p>
-<pre><code>./run.sh</code></pre>
-<p>Type, or copy-paste, this into your terminal. The firmware will run. Let it run for a little bit and then holding control, press the C key to stop it.</p>
+<pre><code>$ ./run.sh</code></pre>
+<p>Type, or copy-paste, this into your terminal. The firmware will run. Let it run for a little bit. You can press CTRL-C to stop/terminate the emulation.</p>
 <p>The run.sh file contains the following command:</p>
-<pre><code>halucinator-rehost \
+<pre><code>$ halucinator-rehost \
   -c=./config.yaml \
   -a=./addrs.yaml \
   -m=./mem.yaml \
   --log_blocks -n stm32f411re_uart</code></pre>
 <p>So all the files you have modified, you should now see being used.</p>
-<p>Next, we will go a little bit further and communicate with the firmware! We will send events to the device!</p>
+<p>So far, we have been configuring the emulator and running it but we are not yet interacting with the device. The HALucinator baseline comes with a simple UART device that allows you to connect a terminal to it. You can interact with your emulated firmware by running the following command:</p>
+<pre><code>$ python3 -m halucinator.external_devices.uart_interactive</code></pre>
+<h2 id="scripting-firmware-interaction">Scripting firmware interaction</h2>
+<p>Next, we will go a little bit further and communicate with the firmware! We will send events to the device! We therefore connect a virtual device at the other end of the UART. This virtual device is implemented in python.</p>
 <p>To do this, have a look at <code>extdev.py</code> script in this folder. You will see a main function and handler function like this:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode py"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="kw">def</span> message_received(message):</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a>    <span class="co"># </span><span class="al">TODO</span><span class="co">: do something when we receive a message.</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a>    <span class="cf">pass</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a><span class="kw">def</span> main():</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true"></a>    logging.basicConfig()</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true"></a></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true"></a>    halzmq <span class="op">=</span> HALucinatorZMQConn(<span class="dv">5556</span>, <span class="dv">5555</span>) </span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true"></a>    uart <span class="op">=</span> UartPeripheral(halzmq, received_callback<span class="op">=</span>message_received)</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true"></a></span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true"></a>    halzmq.start()</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true"></a></span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true"></a>    <span class="cf">try</span>:</span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true"></a>        <span class="co"># </span><span class="al">TODO</span><span class="co">: send some commands.</span></span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true"></a>        <span class="cf">pass</span></span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true"></a>    <span class="cf">except</span> <span class="pp">KeyboardInterrupt</span>:</span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true"></a>        <span class="cf">pass</span></span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true"></a>    log.info(<span class="st">&quot;Shutting Down&quot;</span>)</span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true"></a>    halzmq.shutdown()</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode py"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="kw">def</span> message_received(message):</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a>    <span class="co"># </span><span class="al">TODO</span><span class="co">: do something when we receive a message.</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a>    <span class="cf">pass</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true"></a><span class="kw">def</span> main():</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true"></a>    logging.basicConfig()</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true"></a>    halzmq <span class="op">=</span> HALucinatorZMQConn(<span class="dv">5556</span>, <span class="dv">5555</span>) </span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true"></a>    uart <span class="op">=</span> UartPeripheral(halzmq, received_callback<span class="op">=</span>message_received)</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true"></a></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true"></a>    halzmq.start()</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true"></a></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true"></a>    <span class="cf">try</span>:</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true"></a>        <span class="co"># </span><span class="al">TODO</span><span class="co">: send some commands.</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true"></a>        <span class="cf">pass</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true"></a>    <span class="cf">except</span> <span class="pp">KeyboardInterrupt</span>:</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true"></a>        <span class="cf">pass</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true"></a>    log.info(<span class="st">&quot;Shutting Down&quot;</span>)</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true"></a>    halzmq.shutdown()</span></code></pre></div>
 <p>We want to modify this to send some data to HALucinator. The UartPeripheral object has methods that can help us here. Here are the lines you might consider:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode py"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a>uart.send_line(huart2, <span class="st">&#39;MY_COMMAND</span><span class="ch">\r\n</span><span class="st">&#39;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode py"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a>uart.send_line(huart2, <span class="st">&#39;MY_COMMAND</span><span class="ch">\r\n</span><span class="st">&#39;</span>)</span></code></pre></div>
 <p>You can also print the output received from HALucinator in the terminal by modifying <code>message_received</code> with a simple:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode py"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a><span class="bu">print</span>(message)</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode py"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a><span class="bu">print</span>(message)</span></code></pre></div>
 <p>Add some lines to your python file.</p>
 <p>To see this in action, you first want to launch the firmware using <code>run.sh</code>. Then, open a separate terminal and type</p>
-<pre><code>python extdev.py</code></pre>
+<pre><code>python3 extdev.py</code></pre>
 <p>To run the external device. What output do you see?</p>
