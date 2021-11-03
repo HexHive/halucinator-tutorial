@@ -1,8 +1,9 @@
-#!/bin/sh
+#!/usr/bin/env python
 
 import base64
 import logging
 import random
+import string
 import time
 import sys
 from halucinator.external_devices.external_device import HALucinatorZMQConn, HALucinatorExternalDevice
@@ -31,7 +32,7 @@ class UartPeripheral(HALucinatorExternalDevice):
         else:
             if self.pending == '':
                 self.pending = msg['chars'].decode("utf-8").strip("\r\n")
-            self.recv_callback(pending)
+            self.recv_callback(self.pending)
             self.pending = ''
 
     """
@@ -90,7 +91,7 @@ def selfsigned_certificate(emailAddress="emailAddress",
 def random_string(length):
     return ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(length))
 
-huart2 = 0x200000dc
+huart2 = 0x200000ec
 
 reply_received = False
 
@@ -113,19 +114,27 @@ def main():
     try:
         print("Sending login, then admin, then password, waiting 1 second between each.")
         time.sleep(1)
-        uart.send_line("login")
+        uart.send_line(huart2, "login")
         time.sleep(1)
-        uart.send_line("admin")
+        uart.send_line(huart2, "admin")
         time.sleep(1)
-        uart.send_line("123456")
+        uart.send_line(huart2, "123456")
         time.sleep(1)
         print("Done")
 
         for i in range(0, 100):
-            reply_received = False
-            candidatecert, candidatekey = selfsigned_certificate(countryname='CH', 
+
+            candidatecert, candidatekey = selfsigned_certificate(countryName='CH', 
                                                                  commonName=random_string(20),
                                                                  localityName=random_string(12))
+
+            cert = base64.b64encode(candidatecert).decode("utf-8")
+
+            uart.send_line(huart2, "cert")
+            time.sleep(1)
+
+            reply_received = False
+            uart.send_line(huart2, cert)
             time.sleep(1)
             if reply_received == False:
                 # looks like we killed the firmware!
@@ -136,6 +145,7 @@ def main():
 
     except KeyboardInterrupt:
         pass
+    time.sleep(5)
     log.info("Shutting Down")
     halzmq.shutdown()
 

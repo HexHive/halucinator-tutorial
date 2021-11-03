@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env python
 
 import logging
 import sys
@@ -25,7 +25,7 @@ class UartPeripheral(HALucinatorExternalDevice):
         else:
             if self.pending == '':
                 self.pending = msg['chars'].decode("utf-8").strip("\r\n")
-            self.recv_callback(pending)
+            self.recv_callback(self.pending)
             self.pending = ''
 
     """
@@ -40,7 +40,7 @@ class UartPeripheral(HALucinatorExternalDevice):
             self.send_message('rx_data', d)
 
 
-huart2 = 0x200000dc
+huart2 = 0x200000ec
 
 def message_received(message):
     # TODO: do something useful with the received message
@@ -56,9 +56,11 @@ def main():
     uart.wait()
     try:
         # TODO: send something useful to the firmware
+        # uart.send_line(huart2, ...)
         pass
     except KeyboardInterrupt:
         pass
+    time.sleep(5)
     log.info("Shutting Down")
     halzmq.shutdown()
 

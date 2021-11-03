@@ -1,5 +1,6 @@
-#!/bin/sh
+#!/usr/bin/env python
 
+import time
 import logging
 import sys
 from halucinator.external_devices.external_device import HALucinatorZMQConn, HALucinatorExternalDevice
@@ -25,7 +26,7 @@ class UartPeripheral(HALucinatorExternalDevice):
         else:
             if self.pending == '':
                 self.pending = msg['chars'].decode("utf-8").strip("\r\n")
-            self.recv_callback(pending)
+            self.recv_callback(self.pending)
             self.pending = ''
 
     """
@@ -40,7 +41,7 @@ class UartPeripheral(HALucinatorExternalDevice):
             self.send_message('rx_data', d)
 
 
-huart2 = 0x200000dc
+huart2 = 0x200000ec
 
 def message_received(message):
     print(message)
@@ -54,10 +55,12 @@ def main():
     halzmq.start()
     uart.wait()
     try:
-        uart.send_line("version")
-        uart.send_line("status")
+        uart.send_line(huart2, "version")
+        uart.send_line(huart2, "status")
     except KeyboardInterrupt:
         pass
+
+    time.sleep(5)
     log.info("Shutting Down")
     halzmq.shutdown()
 
