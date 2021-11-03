@@ -36,7 +36,7 @@ function thelp {
 }
 
 function treadme {
-    xdg-open README.html
+    xdg-open $SCRIPTDIR/README.html
 }
 
 function t01 {
