@@ -60,7 +60,7 @@ def main():
         uart.send_line(huart2, "status")
     except KeyboardInterrupt:
         pass
-    time.sleep(15)
+    time.sleep(3)
     log.info("Shutting Down")
     halzmq.shutdown()
 
