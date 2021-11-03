@@ -201,17 +201,17 @@ also run the `cert` command. This responds with a prompt for the base64 encoded 
 which you can get from the functions we have provided.
 
 The function to generate certificates takes parameters as well. What happens if you vary 
-these? For example you might try:
+these? For example you might try changing the common name and extend it with
+random data:
 
 ```
     commonName=random_string(12)
 ```
 
-as a parameter!
-
-Each time the firmware crashes you may need to restart HALucinator and try
-again. These bugs are common programming bugs like missing length checks and
-format string issues, so give those a try!
+Each time the firmware crashes you may need to restart HALucinator (the terminal
+running `./run.sh` --- press Ctrl-C and restart) and try again. These bugs are
+common programming bugs like missing length checks and format string issues, so
+give those a try!
 
 What does the output look like in HALucinator?
 What about if you send C-style format strings?
