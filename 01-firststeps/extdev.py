@@ -53,7 +53,7 @@ def main():
     uart = UartPeripheral(halzmq, received_callback=message_received)
 
     halzmq.start()
-
+    uart.wait()
     try:
         # TODO: send something useful to the firmware
         pass

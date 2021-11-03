@@ -51,9 +51,9 @@ def main():
     uart = UartPeripheral(halzmq, received_callback=message_received)
 
     halzmq.start()
-    time.sleep(2)
+    uart.wait()
 
-    try:
+try:
         uart.send_line(huart2, "version")
         uart.send_line(huart2, "status")
     except KeyboardInterrupt:
