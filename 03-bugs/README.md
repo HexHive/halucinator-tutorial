@@ -45,6 +45,7 @@ from cryptography.hazmat.primitives.serialization import Encoding, PrivateFormat
 from OpenSSL import crypto, SSL
 import base64
 import string
+import random
 
 """
 This function will provide you a random string that is 'length' characters long.
