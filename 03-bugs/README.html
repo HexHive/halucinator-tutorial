@@ -1,4 +1,5 @@
-<h1 id="exploring-firmware-bugs">03: Exploring Firmware Bugs</h1>
+<h1 id="hands-on-03-exploring-firmware-bugs">Hands-on 03: Exploring Firmware Bugs</h1>
+<p><a href="../README.html">Back</a></p>
 <p>For this section we will first introduce the firmware a little bit.</p>
 <p>The firmware listens over UART for a connection, which it treats as a serial console. You can <code>login</code> to the device and if successful, the firmware will accept a base64-encoded <code>DER</code> certificate to sign further firmware, and it will echo back certain information it has found from the certificate.</p>
 <p>As we will explain on the slides, certificates are encoded as ASN.1 using Distinguished Encoding Rules (DER).</p>
@@ -6,11 +7,149 @@
 <p><DER example></p>
 <p>We have taken a perfectly working ASN.1 library and added some bugs for inclusion in your demo firmware today! What we want to do is this:</p>
 <ol type="1">
-<li>Automatically log in to the firmware.</li>
-<li>Generate a certificate.</li>
-<li>Base64-encode it, and send it to the firmware to see what happens.</li>
+<li>Automatically log in to the firmware (part 2)</li>
+<li>Generate a certificate (gencert.py)</li>
+<li>Base64-encode it, and send it to the firmware to see what happens (gencert.py)</li>
 <li>See if the firmware crashes.</li>
 </ol>
-<p>You should be able to tackle #1 from the previous section.</p>
-<p>In <code>gencert.py</code> we have provided some code for you to generate random certificates. What happens if you tweak the function parameters? We ask you to explore this briefly to see the different outputs that you recover.</p>
-<p>Next, we would like you to modify <code>extdev.py</code> to automatically send your generated certificates to the firmware. Can you make the firmware crash? What does that look like?</p>
+<p>The first part is the work we have done in the previous part.</p>
+<p>In <code>gencert.py</code> we have provided some code for you to generate random certificates in the right format. Here is the code:</p>
+<pre><code>from cryptography.hazmat.primitives.asymmetric import ec
+from cryptography.hazmat.primitives.serialization import Encoding, PrivateFormat, NoEncryption
+from OpenSSL import crypto, SSL
+import base64
+import string
+
+&quot;&quot;&quot;
+This function will provide you a random string that is &#39;length&#39; characters long.
+You can use it to help you explore the firmware for bugs.
+&quot;&quot;&quot;
+def random_string(length):
+    return &#39;&#39;.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(length))
+
+
+&quot;&quot;&quot;
+This function takes some of the usual properties you would expect 
+of a certificate. 
+It returns a tuple: DER-encoded certificate, DER-encoded private key.
+
+Note: probably this should be done with cryptography and not 
+pyopenssl.
+&quot;&quot;&quot;
+def selfsigned_certificate(emailAddress=&quot;emailAddress&quot;,
+             commonName=&quot;commonName&quot;,
+             countryName=&quot;NT&quot;,
+             localityName=&quot;localityName&quot;,
+             stateOrProvinceName=&quot;stateOrProvinceName&quot;,
+             organizationName=&quot;organizationName&quot;,
+             organizationUnitName=&quot;organizationUnitName&quot;,
+             serialNumber=0,
+             validityStartInSeconds=0,
+             validityEndInSeconds=10*365*24*60*60):
+
+    # For small keys and fast generation, lets do this 
+    # using P-256:
+    q = ec.generate_private_key(ec.SECP256R1)
+    q_der = q.private_bytes(encoding=Encoding.DER, format=PrivateFormat.TraditionalOpenSSL, encryption_algorithm=NoEncryption())
+    k = crypto.load_privatekey(crypto.FILETYPE_ASN1, q_der)
+
+    cert = crypto.X509()
+    cert.get_subject().C = countryName
+    cert.get_subject().ST = stateOrProvinceName
+    cert.get_subject().L = localityName
+    cert.get_subject().O = organizationName
+    cert.get_subject().OU = organizationUnitName
+    cert.get_subject().CN = commonName
+    cert.get_subject().emailAddress = emailAddress
+    cert.set_serial_number(serialNumber)
+    cert.gmtime_adj_notBefore(0)
+    cert.gmtime_adj_notAfter(validityEndInSeconds)
+    cert.set_issuer(cert.get_subject())
+    cert.set_pubkey(k)
+    cert.sign(k, &#39;sha512&#39;)
+
+    return (crypto.dump_certificate(crypto.FILETYPE_ASN1, cert), q_der)</code></pre>
+<p>Add this to your <code>extdev.py</code> in part 3. Now, you can use this code like this:</p>
+<pre><code>certificate, privkey = selfsigned_certificate()
+b64_cert = base64.b64encode(certificate).decode(&#39;utf-8&#39;)</code></pre>
+<p>Then <code>b64_cert</code> contains a base64-encoded version of the certificate.</p>
+<p>What does this look like when we decompile it? The library we have used would print the raw encoding like this:</p>
+<pre><code>* ASN1_TAG_SEQUENCE
+  * ASN1_TAG_SEQUENCE
+    * ASN1_CLASS_CONTEXT:0
+      - ASN1_TAG_INT 2
+    - ASN1_TAG_INT &lt;INVALID&gt;
+    * ASN1_TAG_SEQUENCE
+      - ASN1_TAG_OID 1.2.840.113549.1.1.11
+      - ASN1_TAG_NULL
+    * ASN1_TAG_SEQUENCE
+      * ASN1_TAG_SET
+        * ASN1_TAG_SEQUENCE
+          - ASN1_TAG_OID 2.5.4.6
+          - ASN1_TAG_PRINTABLESTRING &#39;US&#39;
+      * ASN1_TAG_SET
+        * ASN1_TAG_SEQUENCE
+          - ASN1_TAG_OID 2.5.4.10
+          - ASN1_TAG_PRINTABLESTRING &#39;Entrust, Inc.&#39;
+      * ASN1_TAG_SET
+        * ASN1_TAG_SEQUENCE
+          - ASN1_TAG_OID 2.5.4.11
+          - ASN1_TAG_PRINTABLESTRING &#39;See www.entrust.net/legal-terms&#39;
+      * ASN1_TAG_SET
+        * ASN1_TAG_SEQUENCE
+          - ASN1_TAG_OID 2.5.4.11
+          - ASN1_TAG_PRINTABLESTRING &#39;(c) 2012 Entrust, Inc. - for authorized use only&#39;
+      * ASN1_TAG_SET
+        * ASN1_TAG_SEQUENCE
+          - ASN1_TAG_OID 2.5.4.3
+          - ASN1_TAG_PRINTABLESTRING &#39;Entrust Certification Authority - L1K&#39;
+    * ASN1_TAG_SEQUENCE
+      - ASN1_TAG_UTCTIME 2021-10-13 13:49:14 UTC
+      - ASN1_TAG_UTCTIME 2022-11-05 13:49:14 UTC
+    * ASN1_TAG_SEQUENCE
+      * ASN1_TAG_SET
+        * ASN1_TAG_SEQUENCE
+          - ASN1_TAG_OID 2.5.4.6
+          - ASN1_TAG_PRINTABLESTRING &#39;US&#39;
+      * ASN1_TAG_SET
+        * ASN1_TAG_SEQUENCE
+          - ASN1_TAG_OID 2.5.4.8
+          - ASN1_TAG_PRINTABLESTRING &#39;Virginia&#39;
+      * ASN1_TAG_SET
+        * ASN1_TAG_SEQUENCE
+          - ASN1_TAG_OID 2.5.4.7
+          - ASN1_TAG_PRINTABLESTRING &#39;Arlington&#39;
+      * ASN1_TAG_SET
+        * ASN1_TAG_SEQUENCE
+          - ASN1_TAG_OID 2.5.4.10
+          - ASN1_TAG_PRINTABLESTRING &#39;Office of Naval Research&#39;
+      * ASN1_TAG_SET
+        * ASN1_TAG_SEQUENCE
+          - ASN1_TAG_OID 2.5.4.3
+          - ASN1_TAG_PRINTABLESTRING &#39;www.onr.navy.mil&#39;</code></pre>
+<p>This binary format can be simplified by user agents such as browsers. Something more human would look like this:</p>
+<pre><code>---
+Version: 2, Algo: 4
+Valid from: hT, to: hT
+Issuer:
+  Country:             US
+  Organization:        Entrust, Inc.
+  Organizational Unit: See www.entrust.net/legal-terms
+  Organizational Unit: (c) 2012 Entrust, Inc. - for authorized use only
+  Common Name:         Entrust Certification Authority - L1K
+Subject:
+  Country:             US
+  State or Province:   Virginia
+  Locality:            Arlington
+  Organization:        Office of Naval Research
+  Common Name:         www.onr.navy.mil
+Public key: 1</code></pre>
+<p>In our demo firmware, we want to upload a certificate like this that will sign future firmware updates!</p>
+<p>However, we have added bugs to the firmware parser for you to find.</p>
+<p>So, you will need to modify <code>extdev.py</code>. Now you are logged into the device, you can also run the <code>cert</code> command. This responds with a prompt for the base64 encoded <code>DER</code>, which you can get from the functions we have provided.</p>
+<p>The function to generate certificates takes parameters as well. What happens if you vary these? For example you might try:</p>
+<pre><code>commonName=random_string(12)</code></pre>
+<p>as a parameter!</p>
+<p>Each time the firmware crashes you may need to restart halucinator and try again. You are likely to cause halucinator to crash - we made the bugs easy to find!</p>
+<p>What about if you send C-style format strings?</p>
+<p>What does the output look like in HALucinator?</p>

@@ -1,5 +1,7 @@
 # Hands-on 02: Interacting with HALucinator
 
+[Back](../README.html)
+
 This section picks up where the last section ended. Instead of just interacting
 with the firmware through basic commands, we will create a simple shell,
 allowing the analyst to play with the firmware and explore it further.
