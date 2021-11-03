@@ -1,36 +1,61 @@
+# Hands-on 02: Interacting with HALucinator
 
-# 02: Interacting with HALucinator
+This section picks up where the last section ended. Instead of just interacting
+with the firmware through basic commands, we will create a simple shell,
+allowing the analyst to play with the firmware and explore it further.
 
-In this section we will ask you to fill out your demo to be able to 
-interact with the firmware in an arbitrary way, as a shell.
+After setting up a firmware, such basic interaction is the first step an analyst
+would do to get an overview of what features the firmware provides. The analyst
+will hook several devices to probe different I/O capabilities and then play with
+the discovered functionalities.
 
-First, in this folder you will find a script `copy.sh`. Run it with 
+Here, luckily, we're only interacting through the UART so only need to expand
+that interaction.
+
+## Setup / Initialization
+
+We don't need to go through the initialization of HALucinator and the device
+again. Simply run the local `copy.sh` script to copy over files we worked on
+during the first part of the tutorial:
 
 ```
 ./copy.sh
 ```
 
-To copy your setup from the first part into this part.
+To copy your setup from the first part into this part. Note that you can run
+`./copy-cheat.sh` if you want to bootstrap with the provided solution of the
+first part.
 
-Now, we have seen that we have a `UartPeripheral` object that can be 
-configured to have a callback function, and also has a `send_line` 
-method. We want to build a shell out of this, so let's consider 
-how we might do it.
 
-Firstly, we can read all lines being sent to us in python using 
+## Building a custom shell to interact with the firmware
+
+Our goal for this part of the tutorial is to build I/O capabilities and enable
+the analyst to play with the emulated firmware.
+
+For this, we need to build a small shell that can fire off events to trigger the
+main functions of the firmware. We need some parsing for input from the command
+line that is then packaged up and sent to the emulated firmware.
+
+We already learned about the `UartPeripheral` object and how to define callback
+functions that fire when the device returns data. This allows us to communicate
+bidirectionally: `send_line` to send data to the device and adjusting the
+callback function to handle received data.
+
+In Python, we can read input lines (and print them to stdout) as follows:
 
 ```py
 for line in sys.stdin:
     print(line)
 ```
 
-This example will simply echo back what is input. Can you modify 
-`extdev.py` in order to send the input to the external device.
+As a first step, modify `extdev.py` to simply send the commands read from stdin
+to the firmware and display anything the firmware returns.
 
 Does the `message_received` function need any improvement? What 
-about the UartPeripheral class itself?
+about the `UartPeripheral` class itself?
 
-Next, we'll remind you of the commands the device accepts:
+Your friendly co-worker told you that the firmware accepts the following
+commands:
  
  * version
  * status

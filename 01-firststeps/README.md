@@ -1,4 +1,4 @@
-# 01: First Steps with HALucinator
+# Hands-on 01: First Steps with HALucinator
 
 In this part of the tutorial we will run, for the first time, a firmware under
 HALucinator.
