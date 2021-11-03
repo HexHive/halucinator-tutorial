@@ -4,6 +4,15 @@ from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.primitives.serialization import Encoding, PrivateFormat, NoEncryption
 from OpenSSL import crypto, SSL
 import base64
+import string
+
+"""
+This function will provide you a random string that is 'length' characters long.
+You can use it to help you explore the firmware for bugs.
+"""
+def random_string(length):
+    return ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(length))
+
 
 """
 This function takes some of the usual properties you would expect 
@@ -48,7 +57,7 @@ def selfsigned_certificate(emailAddress="emailAddress",
     return (crypto.dump_certificate(crypto.FILETYPE_ASN1, cert), q_der)
 
 certificate, privkey = selfsigned_certificate()
-b64_cert = base64.b64encode(certificate)
+b64_cert = base64.b64encode(certificate).decode('utf-8')
 
 print(certificate)
 print(b64_cert)
