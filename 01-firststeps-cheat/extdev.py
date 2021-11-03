@@ -3,6 +3,7 @@
 import time
 import logging
 import sys
+import time
 from halucinator.external_devices.external_device import HALucinatorZMQConn, HALucinatorExternalDevice
 
 log = logging.getLogger("UartPeripheral")
@@ -30,14 +31,14 @@ class UartPeripheral(HALucinatorExternalDevice):
             self.pending = ''
 
     """
-    send_line sends a command over ZeroMQ to over ZeroMQ to the Uart Device.
+    send_line sends a command over ZeroMQ to the Uart Device.
     """
-    def send_line(self, id, chars):
+    def send_line(self, mid, chars):
         chars = chars.strip("\n")
         chars += "\r"
         log.debug("SENDLINE %s", chars.encode("utf-8"))
         for char in chars:
-            d = {'id': id, 'chars': char}
+            d = {'id': mid, 'chars': char}
             self.send_message('rx_data', d)
 
 
@@ -49,7 +50,7 @@ def message_received(message):
 def main():
     logging.basicConfig()
 
-    halzmq = HALucinatorZMQConn(5556, 5555) 
+    halzmq = HALucinatorZMQConn(5556, 5555)
     uart = UartPeripheral(halzmq, received_callback=message_received)
 
     halzmq.start()
@@ -59,8 +60,7 @@ def main():
         uart.send_line(huart2, "status")
     except KeyboardInterrupt:
         pass
-
-    time.sleep(5)
+    time.sleep(15)
     log.info("Shutting Down")
     halzmq.shutdown()
 
