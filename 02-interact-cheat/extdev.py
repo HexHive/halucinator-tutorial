@@ -53,6 +53,7 @@ def main():
     uart = UartPeripheral(halzmq, received_callback=message_received)
 
     halzmq.start()
+    uart.wait()
 
     try:
         print("Sending login, then admin, then password, waiting 1 second between each.")

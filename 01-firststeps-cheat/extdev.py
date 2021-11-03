@@ -52,7 +52,7 @@ def main():
     uart = UartPeripheral(halzmq, received_callback=message_received)
 
     halzmq.start()
-
+    uart.wait()
     try:
         uart.send_line("version")
         uart.send_line("status")
