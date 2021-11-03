@@ -53,7 +53,8 @@ source halenv/bin/activate
 
 # copy the right config file for global halucinator use
 mkdir -p halenv/etc/halucinator/
-cp sw/halucinator-ubuntu-config.yaml halenv/etc/halucinator/config.yaml
+cat sw/halucinator-ubuntu-config.yaml | sed -e "s~/home/ubuntu~${HOME}~g" > halenv/etc/halucinator/config.yaml
+
 
 pushd sw/avatar2
 $PIP install .
