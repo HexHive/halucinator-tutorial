@@ -1,5 +1,5 @@
 
-# 03: Exploring Firmware Bugs 
+# Hands-on 03: Exploring Firmware Bugs 
 
 [Back](../README.html)
 
