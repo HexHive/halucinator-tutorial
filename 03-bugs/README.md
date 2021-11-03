@@ -1,15 +1,12 @@
 # Hands-on 03: Exploring Firmware Bugs 
 
-<<<<<<< HEAD
+[Back](../README.html)
+
 After setting up HALucinator and exploring it, we're going to speed things up a
 bit and will develop a naive fuzzer for our target device. For this section we
 will first introduce the firmware functionality a little bit more. The analyst
 would usually do this through static binary analysis (IDA) or by probing the
 functionality as we did in the previous step.
-=======
-# Hands-on 03: Exploring Firmware Bugs 
-
-[Back](../README.html)
 
 For this section we will first introduce the firmware a little bit.
 
