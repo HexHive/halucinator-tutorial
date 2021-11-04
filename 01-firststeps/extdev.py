@@ -2,6 +2,7 @@
 
 import logging
 import sys
+import time
 from halucinator.external_devices.external_device import HALucinatorZMQConn, HALucinatorExternalDevice
 
 log = logging.getLogger("UartPeripheral")

@@ -6,4 +6,4 @@ cp -fv ../01-firststeps/addrs.yaml .
 cp -fv ../01-firststeps/run.sh .
 cp -fv ../01-firststeps/stm32-f411re-uart.bin .
 cp -fv ../01-firststeps/stm32-f411re-uart.elf .
-cp -fv ../02-firststeps/extdev .
+cp -fv ../02-firststeps/extdev.py .
